@@ -1,8 +1,58 @@
 #include "main.h"
 
-void REG()
+struct fchar{
+	char c;
+	int f;
+};
+
+void REG(string &token)
 {
-	cout<<"reg";
+	fchar count[token.length()];
+	int size = 0;
+	bool check = false;
+	int index;
+	fchar temp;
+	for(int i = 0; i<token.length(); i++)
+	{
+		check = false;
+		for(int j = 0; j<size; j++)
+		{
+			if(token[i] == count[j].c)
+			{
+				count[j].f++;
+				check = true;
+				break;
+			}
+		}
+		if(!check)
+		{
+			count[size].c = token[i];
+			count[size].f = 1;
+			size++;
+		}
+	}
+	for(int i = 0; i< size-1; i++)
+	{
+		index = i;
+		for(int j = i+1; j<size; j++)
+		{
+			if(count[j].f < count[index].f)
+			{
+				index = j;
+			}
+		}
+		if(index != i)
+		{
+			temp = count[i];
+			count[i] = count[index];
+			count[index] = temp;
+		}
+	}
+	for(int i = 0; i< size; i++)
+	{
+		cout<<count[i].c<<count[i].f<<" ";
+	}
+
 }
 void CLE()
 {
@@ -28,6 +78,7 @@ void simulate(string filename)
 	int iD;
 	int maxSize;
 	int result;
+	string token;
 
 	string method, strLine;
 	ifstream MyReadFile(filename);
@@ -35,9 +86,10 @@ void simulate(string filename)
 	{
 		method = strLine.substr(0, strLine.find(" "));
 		strLine.erase(0, strLine.find(' ')+1);
+		token = strLine;
 		if(method == "REG")
 		{
-			REG();
+			REG(token);
 		}
 		else if(method == "CLE")
 		{
