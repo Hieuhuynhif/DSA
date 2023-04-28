@@ -1,23 +1,24 @@
 #include "main.h"
 
-struct fchar{
-	char c;
-	int f;
+struct fstring{
+	string s;
+	int f = 0 ;
 };
 
-void REG(string &token)
+void REG(string &token, string &name, int &iD, int &maxSize, int &result)
 {
-	fchar count[token.length()];
+	fstring count[token.length()];
 	int size = 0;
 	bool check = false;
 	int index;
-	fchar temp;
+	fstring temp;
+	
 	for(int i = 0; i<token.length(); i++)
 	{
 		check = false;
 		for(int j = 0; j<size; j++)
 		{
-			if(token[i] == count[j].c)
+			if(token[i] == count[j].s[0])
 			{
 				count[j].f++;
 				check = true;
@@ -26,7 +27,7 @@ void REG(string &token)
 		}
 		if(!check)
 		{
-			count[size].c = token[i];
+			count[size].s = token[i];
 			count[size].f = 1;
 			size++;
 		}
@@ -48,10 +49,10 @@ void REG(string &token)
 			count[index] = temp;
 		}
 	}
-	for(int i = 0; i< size; i++)
-	{
-		cout<<count[i].c<<count[i].f<<" ";
-	}
+	
+	
+	
+	
 
 }
 void CLE()
@@ -89,7 +90,7 @@ void simulate(string filename)
 		token = strLine;
 		if(method == "REG")
 		{
-			REG(token);
+			REG(token, name, iD, maxSize, result);
 		}
 		else if(method == "CLE")
 		{
