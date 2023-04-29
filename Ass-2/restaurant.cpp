@@ -1,60 +1,79 @@
 #include "main.h"
 
-struct fstring{
-	string s;
-	int f = 0 ;
+struct fStringNode{
+		string data;
+		int fre;
+		fStringNode *left, *right;
 };
+
+fStringNode* createHuffmanTree(fStringNode *&root,fStringNode *&newNode)
+{
+	fStringNode * head = new fStringNode();
+	head->data = "#";
+	head->fre = root->fre + newNode->fre;
+	head->left = newNode;
+	head->right = root;
+	return head;
+}
 
 void REG(string &token, string &name, int &iD, int &maxSize, int &result)
 {
-	fstring count[token.length()];
+	int count[150];
 	int size = 0;
-	bool check = false;
-	int index;
-	fstring temp;
-	
+	for(int i = 0; i< 150; i++)
+	{
+		count[i] = 0;
+	}
 	for(int i = 0; i<token.length(); i++)
 	{
-		check = false;
-		for(int j = 0; j<size; j++)
+		count[token[i]]++;
+	}
+	for(int i = 0; i<150; i++)
+	{
+		if(count[i] != 0)
 		{
-			if(token[i] == count[j].s[0])
-			{
-				count[j].f++;
-				check = true;
-				break;
-			}
-		}
-		if(!check)
-		{
-			count[size].s = token[i];
-			count[size].f = 1;
 			size++;
 		}
 	}
-	for(int i = 0; i< size-1; i++)
+	fStringNode * arrayNode[size];
+	for(int i = 0, index = 0; i<150 ; i++)
+	{
+		if(count[i] != 0)
+		{
+			arrayNode[index] = new fStringNode();
+			arrayNode[index]->data = i;
+			arrayNode[index]->fre = count[i];
+			index++;
+		}
+	}
+	string strTemp;
+	int	numTemp;
+	for(int i = 0, index = 0; i<size-1; i++)
 	{
 		index = i;
 		for(int j = i+1; j<size; j++)
 		{
-			if(count[j].f < count[index].f)
+			if(arrayNode[j]->fre < arrayNode[index]->fre)
 			{
-				index = j;
+				strTemp = arrayNode[index]->data;
+				numTemp = arrayNode[index]->fre;
+				arrayNode[index]->data	= arrayNode[j]->data;
+				arrayNode[index]->fre	=	arrayNode[j]->fre;
+				arrayNode[j]->data = strTemp;
+				arrayNode[j]->fre = numTemp;
 			}
-		}
-		if(index != i)
-		{
-			temp = count[i];
-			count[i] = count[index];
-			count[index] = temp;
 		}
 	}
 	
-	
-	
-	
-
+	fStringNode *root = new fStringNode();
+	root->data = arrayNode[0]->data;
+	root->fre = arrayNode[0]->fre;
+	for(int i = 1; i<size; i++)
+	{
+		root = createHuffmanTree(root, arrayNode[i]);
+	}
 }
+
 void CLE()
 {
 cout<<"cle";
