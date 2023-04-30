@@ -6,14 +6,59 @@ struct fStringNode{
 		fStringNode *left, *right;
 };
 
-fStringNode* createHuffmanTree(fStringNode *&root,fStringNode *&newNode)
+fStringNode* createHuffmanTree(fStringNode *&root,fStringNode ** arrayNode, int &size, int current)
 {
-	fStringNode * head = new fStringNode();
-	head->data = "#";
-	head->fre = root->fre + newNode->fre;
-	head->left = newNode;
-	head->right = root;
-	return head;
+	if(current == size-1)
+	{
+		return root;
+	}
+	else
+	{
+		fStringNode *head = new fStringNode();
+		head->data = "#";
+		head->fre = arrayNode[current]->fre + arrayNode[current+1]->fre;
+		head->left = arrayNode[current];
+		head->right = arrayNode[current + 1];
+		arrayNode[current+1] = head;
+		current++;
+		fStringNode *temp;
+		for(int i = current, index, in; i<size-1; i++)
+		{
+			index = i;
+			for(int j = i+1; j<size; j++)
+			{
+				if(arrayNode[j]->fre < arrayNode[index]->fre)
+				{
+					index = j;
+				}
+			}
+			if(index != i)
+			{
+				temp = arrayNode[i];
+				arrayNode[i] = arrayNode[index];
+				arrayNode[index] = temp;
+			}
+		}
+
+		return createHuffmanTree(arrayNode[current], arrayNode, size, current);
+	}
+}
+
+void pathStr(fStringNode *root, string str, string current, string &path)
+{
+	if(root == nullptr)
+	{
+		return;
+	}
+	if(root->data == str)
+	{
+		path = current;
+	}
+	else
+	{
+		pathStr(root->left, str, current+"0", path);
+		pathStr(root->right, str, current+"1", path);
+	}
 }
 
 void REG(string &token, string &name, int &iD, int &maxSize, int &result)
@@ -46,8 +91,7 @@ void REG(string &token, string &name, int &iD, int &maxSize, int &result)
 			index++;
 		}
 	}
-	string strTemp;
-	int	numTemp;
+	fStringNode *temp;
 	for(int i = 0, index = 0; i<size-1; i++)
 	{
 		index = i;
@@ -55,23 +99,31 @@ void REG(string &token, string &name, int &iD, int &maxSize, int &result)
 		{
 			if(arrayNode[j]->fre < arrayNode[index]->fre)
 			{
-				strTemp = arrayNode[index]->data;
-				numTemp = arrayNode[index]->fre;
-				arrayNode[index]->data	= arrayNode[j]->data;
-				arrayNode[index]->fre	=	arrayNode[j]->fre;
-				arrayNode[j]->data = strTemp;
-				arrayNode[j]->fre = numTemp;
+				index = j;
 			}
 		}
+		if(index != i)
+		{
+			temp = arrayNode[i];
+			arrayNode[i] = arrayNode[index];
+			arrayNode[index] = temp;
+		}
 	}
-	
+
 	fStringNode *root = new fStringNode();
-	root->data = arrayNode[0]->data;
-	root->fre = arrayNode[0]->fre;
-	for(int i = 1; i<size; i++)
+	root = createHuffmanTree(root, arrayNode, size, 0);
+
+	string binaryCode = "";
+	string str;
+	string path;
+	for(int i = 0; i<token.length(); i++)
 	{
-		root = createHuffmanTree(root, arrayNode[i]);
+		str = token[i];
+		pathStr(root, str, "", path);
+		binaryCode += path;
 	}
+	cout<<binaryCode;
+	
 }
 
 void CLE()
