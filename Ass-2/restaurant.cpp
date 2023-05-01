@@ -6,10 +6,14 @@ struct fStringNode{
 		fStringNode *left, *right;
 };
 struct Customer{
-	int id = -1;
-	int result = -1;
-	int num = -1;
+	string name = "-1";
+	int id		= -1;
+	int result	= -1;
+	int num		= -1;
+	int kv		= -1;
+	Customer *left, *right;
 };
+
 fStringNode* createHuffmanTree(fStringNode *&root,fStringNode ** arrayNode, int &size, int current)
 {
 	if(current == size-1)
@@ -64,48 +68,56 @@ void pathStr(fStringNode *root, string str, string current, string &path)
 		pathStr(root->right, str, current+"1", path);
 	}
 }
-bool addSea(Customer *&seaList, int &result)
+void addSea(Customer *&seaList, Customer ctm)
 {
-		int id = result%MAXSIZE + 1;
-		int index = result%(MAXSIZE/2);
-		if(seaList[index].id == -1)
+	int hashtable = ctm.result%(MAXSIZE/2);
+	if(seaList[hashtable].id == -1)
+	{
+		seaList[hashtable] = ctm;
+	}
+	else
+	{
+		int current = hashtable + 1;
+		while (current != hashtable)
 		{
-			seaList[index].id = id;
-			seaList[index].result = result;
-			seaList[index].num = id;
-			return true;
-		}
-		else
-		{
-			int current = index + 1;
-			while(current != index)
+			if(seaList[current].id == -1)
 			{
-				if(seaList[current].id == -1)
-				{
-					seaList[current].id = id;
-					seaList[current].result = result;
-					seaList[current].num = id;
-					return true;
-				}
-				current++;
-				if(current == MAXSIZE/2)
-				{
-					current = 0;
-				}
+				seaList[current] = ctm;
+				break;
 			}
-			return false;
-		}
+			current++;
+			if(current == MAXSIZE/2)
+			{
+				current = 0;
+			}
+		}	
+	}
 }
-bool addMountain(int &result)
+void updateSea(Customer *&seaList, string name)
 {
-	int id = result%MAXSIZE + 1;
+	for(int i = 0; i<MAXSIZE/2; i++)
+	{
+		if(seaList[i].name == name)
+		{
+			seaList[i].num++;
+		}
+	}
+}
+void addMountain(Customer *&mountainList, Customer ctm)
+{
 
 }
-void REG(string &token, Customer * seaList, int &seaSize, int &mountainSize)
+
+void replace()
+{
+
+}
+void REG(string &token, Customer * seaList, Customer * mountainList, Customer * list, int &seaSize, int &mountainSize)
 {
 	int count[150];
 	int size = 0;
 	int result;
+	int id;
 	for(int i = 0; i< 150; i++)
 	{
 		count[i] = 0;
@@ -184,37 +196,179 @@ void REG(string &token, Customer * seaList, int &seaSize, int &mountainSize)
 		}
 	}
 
-	if(result % 2)
+	bool check = false;
+	for(int i= 0; i<MAXSIZE; i++)
 	{
-		if(!addSea(seaList, result))
+		if(list[i].name == token)
 		{
-			if(!addMountain(result))
+			list[i].num++;
+			updateSea(seaList, list[i].name);
+			check = true;
+			break;
+		}
+	}
+
+	if(!check)
+	{
+		if(seaSize+mountainSize < MAXSIZE)
+		{
+			id = result%MAXSIZE +1;
+			if(list[id].id == -1)
 			{
-				
+				list[id].name = token;
+				list[id].id = id;
+				list[id].result = result;
+				list[id].num = 1;
+			}
+			else
+			{
+				int current = id + 1;
+				while (current != id)
+				{
+					if(list[current].id == -1)
+					{
+						id = current;
+						break;
+					}
+					current++;
+					if(current > MAXSIZE)
+					{
+						current = 1;
+					}
+				}
+				list[id].name = token;
+				list[id].id = id;
+				list[id].result = result;
+				list[id].num = 1;
+			}
+			Customer ctm;
+			if(result % 2)
+			{
+				if(seaSize < MAXSIZE/2)
+				{
+					list[id].kv = 1;
+					ctm = list[id];
+					addSea(seaList, ctm);
+					seaSize++;
+				}
+				else
+				{
+					list[id].kv = 2;
+					ctm = list[id];
+					addMountain(mountainList, ctm);
+					mountainSize++;
+					
+				}
+
+			}
+			else
+			{
+				if(mountainSize < MAXSIZE/2)
+				{
+					list[id].kv = 2;
+					ctm = list[id];
+					addMountain(mountainList, ctm);
+					mountainSize++;
+				}
+				else
+				{
+					list[id].kv = 1;
+					ctm = list[id];
+					addSea(seaList, ctm);
+					seaSize++;
+				}
+
 			}
 		}
+		else
+		{
+
+		}
+	}
+
+}
+
+void CLE(string token, Customer * list, Customer * seaList, Customer * mountainList, int &seaSize, int &mountainSize)
+{
+	int num = 0;
+	int kv = -1;
+	if(token[0] == 45 || token[0] == 48)
+	{
+		Customer temp;
+		for(int i =0; i< MAXSIZE/2; i++)
+		{
+			seaList[i] = temp;
+		}
+		for(int i = 1; i<=MAXSIZE; i++)
+		{
+			if(list[i].kv == 1)
+			{
+				list[i] = temp;
+			}
+		}
+		seaSize = 0;
 	}
 	else
 	{
-		if(!addMountain(result))
+		for(int i = 0; i<token.length(); i++)
 		{
-			if(!addSea(seaList, result))
+			num = num*10 +(token[i]-48);
+		}
+		if(num > MAXSIZE)
+		{
+			Customer temp;
+			for(int i =0; i< MAXSIZE/2; i++)
 			{
-
+				mountainList[i] = temp;
+			}
+			for(int i = 1; i<=MAXSIZE; i++)
+			{
+				if(list[i].kv == 2)
+				{
+					list[i] = temp;
+				}
 			}
 		}
+		else
+		{
+			Customer temp;
+			if(list[num].id != -1)
+			{
+				if(list[num].kv == 1)
+				{
+					list[num] = temp;
+					for(int i = 0 ; i< MAXSIZE/2; i++)
+					{
+						if(seaList[i].id == num)
+						{
+							seaList[i] = temp;
+							break;
+						}
+					}
+					seaSize--;
+				}
+				else
+				{
 
+				}
+			}
+			else
+			{
+				return;
+			}
+		}
 	}
 	
 }
-
-void CLE()
+void PrintHT(Customer * seaList)
 {
-cout<<"cle";
-}
-void PrintHT()
-{
-cout<<"ht";
+	for(int i = 0; i<MAXSIZE/2; i++)
+	{
+		if(seaList[i].id != -1)
+		{
+			cout<<seaList[i].id<<"-"<<seaList[i].result<<"-"<<seaList[i].num<<endl;
+		}
+	}
 }
 void PrintAVL()
 {
@@ -228,11 +382,14 @@ cout<<"mh";
 void simulate(string filename)
 {
 	Customer seaList[MAXSIZE/2];
+	Customer mountainList[MAXSIZE/2];
+	Customer list[MAXSIZE+1];
 	int seaSize = 0;
 	int mountainSize = 0;
 	string token;
 	string method, strLine;
 	ifstream MyReadFile(filename);
+
 	while(getline(MyReadFile, strLine))
 	{
 		method = strLine.substr(0, strLine.find(" "));
@@ -240,15 +397,15 @@ void simulate(string filename)
 		token = strLine;
 		if(method == "REG")
 		{
-			REG(token, seaList, seaSize, mountainSize);
+			REG(token, seaList, mountainList, list, seaSize, mountainSize);
 		}
 		else if(method == "CLE")
 		{
-			CLE();
+			CLE(token, list, seaList, mountainList, seaSize, mountainSize);
 		}
 		else if(method == "PrintHT")
 		{
-			PrintHT();
+			PrintHT(seaList);
 		}
 		else if(method == "PrintAVL")
 		{
@@ -259,5 +416,8 @@ void simulate(string filename)
 			PrintMH();
 		}
 	}
+
+	cout<<"---"<<seaSize<<" "<<mountainSize<<" ";
+	cout<<endl;
 	return;
 }
