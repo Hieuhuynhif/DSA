@@ -696,7 +696,5 @@ void simulate(string filename)
 	cout<<"---"<<seaSize<<" "<<mountainSize<<" ";
 	cout<<endl;
 
-
-	
 	return;
 }
