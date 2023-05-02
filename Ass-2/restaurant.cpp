@@ -14,6 +14,241 @@ struct Customer{
 	Customer *left, *right;
 };
 
+class Node
+{
+    public:
+    Customer key;
+    Node *left;
+    Node *right;
+    int height;
+};
+int height(Node *N)
+{
+    if (N == NULL)
+        return 0;
+    return N->height;
+}
+int max(int a, int b)
+{
+    return (a > b)? a : b;
+}
+Node* newNode(Customer key)
+{
+    Node* node = new Node();
+    node->key = key;
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1; // new node is initially
+                      // added at leaf
+    return(node);
+}
+Node *rightRotate(Node *y)
+{
+    Node *x = y->left;
+    Node *T2 = x->right;
+ 
+    // Perform rotation
+    x->right = y;
+    y->left = T2;
+ 
+    // Update heights
+    y->height = max(height(y->left),
+                    height(y->right)) + 1;
+    x->height = max(height(x->left),
+                    height(x->right)) + 1;
+ 
+    // Return new root
+    return x;
+}
+Node *leftRotate(Node *x)
+{
+    Node *y = x->right;
+    Node *T2 = y->left;
+ 
+    // Perform rotation
+    y->left = x;
+    x->right = T2;
+ 
+    // Update heights
+    x->height = max(height(x->left),   
+                    height(x->right)) + 1;
+    y->height = max(height(y->left),
+                    height(y->right)) + 1;
+ 
+    // Return new root
+    return y;
+}
+int getBalance(Node *N)
+{
+    if (N == nullptr)
+        return 0;
+    return height(N->left) - height(N->right);
+}
+Node* insert(Node *& node, Customer key)
+{
+    /* 1. Perform the normal BST insertion */
+    if (node == nullptr)
+        return(newNode(key));
+ 
+    if (key.result < node->key.result)
+        node->left = insert(node->left, key);
+    else if (key.result >= node->key.result)
+        node->right = insert(node->right, key);
+    else // Equal keys are not allowed in BST
+        return node;
+ 
+    /* 2. Update height of this ancestor node */
+    node->height = 1 + max(height(node->left),
+                        height(node->right));
+ 
+    /* 3. Get the balance factor of this ancestor
+        node to check whether this node became
+        unbalanced */
+    int balance = getBalance(node);
+ 
+    // If this node becomes unbalanced, then
+    // there are 4 cases
+ 
+    // Left Left Case
+    if (balance > 1 && key.result < node->left->key.result)
+        return rightRotate(node);
+ 
+    // Right Right Case
+    if (balance < -1 && key.result > node->right->key.result)
+        return leftRotate(node);
+ 
+    // Left Right Case
+    if (balance > 1 && key.result > node->left->key.result)
+    {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+ 
+    // Right Left Case
+    if (balance < -1 && key.result < node->right->key.result)
+    {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+ 
+    /* return the (unchanged) node pointer */
+    return node;
+}
+Node * minValueNode(Node* &node)
+{
+    Node* current = node;
+ 
+    /* loop down to find the leftmost leaf */
+    while (current->left != NULL)
+        current = current->left;
+ 
+    return current;
+}
+Node* deleteNode(Node* &root, Customer key)
+{
+     
+    // STEP 1: PERFORM STANDARD BST DELETE
+    if (root == NULL)
+        return root;
+ 
+    // If the key to be deleted is smaller
+    // than the root's key, then it lies
+    // in left subtree
+    if ( key.result < root->key.result )
+        root->left = deleteNode(root->left, key);
+ 
+    // If the key to be deleted is greater
+    // than the root's key, then it lies
+    // in right subtree
+    else if( key.result > root->key.result )
+        root->right = deleteNode(root->right, key);
+ 
+    // if key is same as root's key, then
+    // This is the node to be deleted
+    else
+    {
+        // node with only one child or no child
+        if( (root->left == NULL) ||
+            (root->right == NULL) )
+        {
+            Node *temp = root->left ?
+                         root->left :
+                         root->right;
+ 
+            // No child case
+            if (temp == NULL)
+            {
+                temp = root;
+                root = NULL;
+            }
+            else // One child case
+            *root = *temp; // Copy the contents of
+                           // the non-empty child
+            free(temp);
+        }
+        else
+        {
+            // node with two children: Get the inorder
+            // successor (smallest in the right subtree)
+            Node* temp = minValueNode(root->right);
+ 
+            // Copy the inorder successor's
+            // data to this node
+            root->key = temp->key;
+ 
+            // Delete the inorder successor
+            root->right = deleteNode(root->right,
+                                     temp->key);
+        }
+    }
+ 
+    // If the tree had only one node
+    // then return
+    if (root == NULL)
+    return root;
+ 
+    // STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
+    root->height = 1 + max(height(root->left),
+                           height(root->right));
+ 
+    // STEP 3: GET THE BALANCE FACTOR OF
+    // THIS NODE (to check whether this
+    // node became unbalanced)
+    int balance = getBalance(root);
+ 
+    // If this node becomes unbalanced,
+    // then there are 4 cases
+ 
+    // Left Left Case
+    if (balance > 1 &&
+        getBalance(root->left) >= 0)
+        return rightRotate(root);
+ 
+    // Left Right Case
+    if (balance > 1 &&
+        getBalance(root->left) < 0)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+ 
+    // Right Right Case
+    if (balance < -1 &&
+        getBalance(root->right) <= 0)
+        return leftRotate(root);
+ 
+    // Right Left Case
+    if (balance < -1 &&
+        getBalance(root->right) > 0)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+ 
+    return root;
+}
+
+
 fStringNode* createHuffmanTree(fStringNode *&root,fStringNode ** arrayNode, int &size, int current)
 {
 	if(current == size-1)
@@ -103,16 +338,49 @@ void updateSea(Customer *&seaList, string name)
 		}
 	}
 }
-void addMountain(Customer *&mountainList, Customer ctm)
+void addMountain(Node *&mountainList, Customer ctm)
 {
-
+	mountainList =  insert(mountainList, ctm);
 }
 
-void replace()
+void replace(Customer * seaList, Node *&mountainList, int &result, queue<int> a)
 {
+	int OPT = result%3;
+	if(OPT == 0)
+	{
+		if(result%2)
+		{
 
+		}
+		else
+		{
+
+		}
+	}
+	else if(OPT == 1)
+	{
+		if(result%2)
+		{
+
+		}
+		else
+		{
+			
+		}
+	}
+	else
+	{
+		if(result%2)
+		{
+
+		}
+		else
+		{
+			
+		}
+	}
 }
-void REG(string &token, Customer * seaList, Customer * mountainList, Customer * list, int &seaSize, int &mountainSize)
+void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list, int &seaSize, int &mountainSize, queue<int> &queue)
 {
 	int count[150];
 	int size = 0;
@@ -204,6 +472,7 @@ void REG(string &token, Customer * seaList, Customer * mountainList, Customer * 
 			list[i].num++;
 			updateSea(seaList, list[i].name);
 			check = true;
+			queue.push(list[i].id);
 			break;
 		}
 	}
@@ -241,6 +510,7 @@ void REG(string &token, Customer * seaList, Customer * mountainList, Customer * 
 				list[id].result = result;
 				list[id].num = 1;
 			}
+			queue.push(list[id].id);
 			Customer ctm;
 			if(result % 2)
 			{
@@ -282,13 +552,13 @@ void REG(string &token, Customer * seaList, Customer * mountainList, Customer * 
 		}
 		else
 		{
-
+			replace(seaList, mountainList, result, queue);
 		}
 	}
 
 }
 
-void CLE(string token, Customer * list, Customer * seaList, Customer * mountainList, int &seaSize, int &mountainSize)
+void CLE(string token, Customer * list, Customer * seaList, Node *& mountainList, int &seaSize, int &mountainSize, queue<int> &queue)
 {
 	int num = 0;
 	int kv = -1;
@@ -317,17 +587,15 @@ void CLE(string token, Customer * list, Customer * seaList, Customer * mountainL
 		if(num > MAXSIZE)
 		{
 			Customer temp;
-			for(int i =0; i< MAXSIZE/2; i++)
-			{
-				mountainList[i] = temp;
-			}
 			for(int i = 1; i<=MAXSIZE; i++)
 			{
 				if(list[i].kv == 2)
 				{
+					mountainList = deleteNode(mountainList, list[i]);
 					list[i] = temp;
 				}
 			}
+			mountainSize = 0;
 		}
 		else
 		{
@@ -349,7 +617,8 @@ void CLE(string token, Customer * list, Customer * seaList, Customer * mountainL
 				}
 				else
 				{
-
+					mountainList = deleteNode(mountainList, list[num]);
+					mountainSize--;
 				}
 			}
 			else
@@ -360,19 +629,25 @@ void CLE(string token, Customer * list, Customer * seaList, Customer * mountainL
 	}
 	
 }
-void PrintHT(Customer * seaList)
+void PrintHT(Customer * seaList, int &seaSize)
 {
-	for(int i = 0; i<MAXSIZE/2; i++)
+	if(seaSize !=0)
 	{
-		if(seaList[i].id != -1)
+		for(int i = 0; i<MAXSIZE/2; i++)
 		{
-			cout<<seaList[i].id<<"-"<<seaList[i].result<<"-"<<seaList[i].num<<endl;
+			if(seaList[i].id != -1)
+			{
+				cout<<seaList[i].id<<"-"<<seaList[i].result<<"-"<<seaList[i].num<<endl;
+			}
 		}
 	}
 }
-void PrintAVL()
+void PrintAVL(Node *& mountainList, int &mountainSize)
 {
-cout<<"avl";
+	if(mountainSize !=0)
+	{
+		cout<<mountainList->key.id<<"-"<<mountainList->key.result<<"-"<<mountainList->key.num<<endl;;
+	}
 }
 void PrintMH()
 {
@@ -382,8 +657,9 @@ cout<<"mh";
 void simulate(string filename)
 {
 	Customer seaList[MAXSIZE/2];
-	Customer mountainList[MAXSIZE/2];
+	Node *mountainList = nullptr;
 	Customer list[MAXSIZE+1];
+	queue<int> queue;
 	int seaSize = 0;
 	int mountainSize = 0;
 	string token;
@@ -397,19 +673,19 @@ void simulate(string filename)
 		token = strLine;
 		if(method == "REG")
 		{
-			REG(token, seaList, mountainList, list, seaSize, mountainSize);
+			REG(token, seaList, mountainList, list, seaSize, mountainSize, queue);
 		}
 		else if(method == "CLE")
 		{
-			CLE(token, list, seaList, mountainList, seaSize, mountainSize);
+			CLE(token, list, seaList, mountainList, seaSize, mountainSize, queue);
 		}
 		else if(method == "PrintHT")
 		{
-			PrintHT(seaList);
+			PrintHT(seaList, seaSize);
 		}
 		else if(method == "PrintAVL")
 		{
-			PrintAVL();
+			PrintAVL(mountainList, mountainSize);
 		}
 		else if(method == "PrintMH")
 		{
@@ -419,5 +695,8 @@ void simulate(string filename)
 
 	cout<<"---"<<seaSize<<" "<<mountainSize<<" ";
 	cout<<endl;
+
+
+	
 	return;
 }
