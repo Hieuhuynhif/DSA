@@ -343,41 +343,100 @@ void addMountain(Node *&mountainList, Customer ctm)
 	mountainList =  insert(mountainList, ctm);
 }
 
-void replace(Customer * seaList, Node *&mountainList, int &result, queue<int> a)
+void replace(Customer *&seaList, Node *&mountainList, Customer *&list, int &result, string &name, queue<int> &q)
 {
 	int OPT = result%3;
 	if(OPT == 0)
 	{
-		if(result%2)
+		int id = q.front();
+		if(list[id].kv == 1)
 		{
-
+			for(int i = 0; i< MAXSIZE/2; i++)
+			{
+				if(seaList[i].id == id)
+				{
+					list[id].name = name;
+					list[id].result = result;
+					list[id].num = 1;
+					seaList[i].name = name;
+					seaList[i].result = result;
+					seaList[i].num = 1;
+					q.pop();
+					q.push(id);
+					break;
+				}
+			}
 		}
 		else
 		{
-
+			mountainList = deleteNode(mountainList, list[id]);
+			list[id].name = name;
+			list[id].result = result;
+			list[id].num = 1;
+			addMountain(mountainList, list[id]);
+			q.pop();
+			q.push(id);
 		}
 	}
 	else if(OPT == 1)
 	{
-		if(result%2)
+		int id = q.back();
+		if(list[id].kv == 1)
 		{
+			for(int i = 0; i< MAXSIZE/2; i++)
+			{
+				if(seaList[i].id == id)
+				{
+					list[id].name = name;
+					list[id].result = result;
+					list[id].num = 1;
+					seaList[i].name = name;
+					seaList[i].result = result;
+					seaList[i].num = 1;
 
+					queue<int> temp;
+					while (q.size() != 1)
+					{
+						temp.push(q.front());
+						q.pop();
+					}
+					q.pop();
+					
+					while(temp.size() != 0)
+					{
+						q.push(temp.front());
+						temp.pop();
+					}
+					break;
+				}
+			}			
 		}
 		else
 		{
+			mountainList = deleteNode(mountainList, list[id]);
+			list[id].name = name;
+			list[id].result = result;
+			list[id].num = 1;
+			addMountain(mountainList, list[id]);
 			
+			queue<int> temp;
+			while (q.size() != 1)
+			{
+				temp.push(q.front());
+				q.pop();
+			}
+			q.pop();
+			
+			while(temp.size() != 0)
+			{
+				q.push(temp.front());
+				temp.pop();
+			}
 		}
 	}
 	else
 	{
-		if(result%2)
-		{
 
-		}
-		else
-		{
-			
-		}
 	}
 }
 void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list, int &seaSize, int &mountainSize, queue<int> &queue)
@@ -527,7 +586,6 @@ void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list
 					ctm = list[id];
 					addMountain(mountainList, ctm);
 					mountainSize++;
-					
 				}
 
 			}
@@ -552,7 +610,7 @@ void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list
 		}
 		else
 		{
-			replace(seaList, mountainList, result, queue);
+			replace(seaList, mountainList, list, result, token, queue);
 		}
 	}
 
