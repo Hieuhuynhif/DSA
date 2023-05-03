@@ -651,7 +651,7 @@ void PrintAVL(Node *& mountainList, int &mountainSize)
 }
 void PrintMH()
 {
-cout<<"mh";
+
 }
 
 void simulate(string filename)
@@ -692,9 +692,6 @@ void simulate(string filename)
 			PrintMH();
 		}
 	}
-
-	cout<<"---"<<seaSize<<" "<<mountainSize<<" ";
-	cout<<endl;
 
 	return;
 }
