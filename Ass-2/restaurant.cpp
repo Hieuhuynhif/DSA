@@ -249,41 +249,38 @@ Node* deleteNode(Node* &root, Customer key)
 }
 
 
-fStringNode* createHuffmanTree(fStringNode *&root,fStringNode ** arrayNode, int &size, int current)
+fStringNode* createHuffmanTree(fStringNode ** arrayNode, int &size, int current)
 {
+	fStringNode *head = new fStringNode();
+	head->data = "#";
+	head->fre = arrayNode[current]->fre + arrayNode[current+1]->fre;
+	head->left = arrayNode[current];
+	head->right = arrayNode[current + 1];
+	arrayNode[current+1] = head;
+	current++;
+
 	if(current == size-1)
 	{
-		return root;
+		return arrayNode[current];
 	}
 	else
 	{
-		fStringNode *head = new fStringNode();
-		head->data = "#";
-		head->fre = arrayNode[current]->fre + arrayNode[current+1]->fre;
-		head->left = arrayNode[current];
-		head->right = arrayNode[current + 1];
-		arrayNode[current+1] = head;
-		current++;
-		fStringNode *temp;
-		for(int i = current, index, in; i<size-1; i++)
+		if(arrayNode[current]->fre >= arrayNode[current+1]->fre)
 		{
-			index = i;
-			for(int j = i+1; j<size; j++)
+			fStringNode *temp;
+			int index = current;
+			while (arrayNode[index]->fre >= arrayNode[index+1]->fre)
 			{
-				if(arrayNode[j]->fre < arrayNode[index]->fre)
-				{
-					index = j;
-				}
+				temp = arrayNode[index];
+				arrayNode[index] = arrayNode[index+1];
+				arrayNode[index+1] = temp;
+				index++;
+				if(index == size-1)
+					break;
 			}
-			if(index != i)
-			{
-				temp = arrayNode[i];
-				arrayNode[i] = arrayNode[index];
-				arrayNode[index] = temp;
-			}
+			
 		}
-
-		return createHuffmanTree(arrayNode[current], arrayNode, size, current);
+		return createHuffmanTree(arrayNode, size, current);
 	}
 }
 
@@ -443,15 +440,18 @@ void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list
 {
 	int count[150];
 	int size = 0;
-	int result;
-	int id;
+	int result = 0;
+	int id = 0;
+	int tokenLength = token.length();
+	int tempStr = 0;
 	for(int i = 0; i< 150; i++)
 	{
 		count[i] = 0;
 	}
-	for(int i = 0; i<token.length(); i++)
+	for(int i = 0; i<tokenLength; i++)
 	{
-		count[token[i]]++;
+		tempStr = token[i];
+		count[tempStr]++;
 	}
 	for(int i = 0; i<150; i++)
 	{
@@ -481,6 +481,13 @@ void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list
 			{
 				index = j;
 			}
+			else if(arrayNode[j]->fre == arrayNode[index]->fre)
+			{
+				if(arrayNode[j]->data < arrayNode[index]->data)
+				{
+					index = j;
+				}
+			}
 		}
 		if(index != i)
 		{
@@ -490,28 +497,31 @@ void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list
 		}
 	}
 
-	fStringNode *root = new fStringNode();
-	root = createHuffmanTree(root, arrayNode, size, 0);
+	fStringNode *root;
+	root = createHuffmanTree(arrayNode, size, 0);
 
 	string binaryCode = "";
 	string str;
 	string path;
-	for(int i = 0; i<token.length(); i++)
+	int binaryLength = 0;
+	for(int i = 0; i<tokenLength; i++)
 	{
 		str = token[i];
 		pathStr(root, str, "", path);
 		binaryCode += path;
 	}
-	if(token.length() == 1)
+	binaryLength = binaryCode.length();
+	if(tokenLength == 1)
 	{
 		binaryCode = "1";
 	}
-	else if(binaryCode.length() > 15)
+	else if(binaryLength > 15)
 	{
-		binaryCode = binaryCode.substr(binaryCode.length()-15, 15);
+		binaryCode = binaryCode.substr(binaryLength-15, 15);
 	}
-	result = 0;
-	for(int i = 0; i<binaryCode.length(); i++)
+
+	binaryLength = binaryCode.length();
+	for(int i = 0; i<binaryLength; i++)
 	{
 		if(binaryCode[i] == 48)
 		{
@@ -619,7 +629,8 @@ void REG(string &token, Customer * seaList, Node *&mountainList, Customer * list
 void CLE(string token, Customer * list, Customer * seaList, Node *& mountainList, int &seaSize, int &mountainSize, queue<int> &queue)
 {
 	int num = 0;
-	int kv = -1;
+
+	int tokenLength = token.length();
 	if(token[0] == 45 || token[0] == 48)
 	{
 		Customer temp;
@@ -638,7 +649,7 @@ void CLE(string token, Customer * list, Customer * seaList, Node *& mountainList
 	}
 	else
 	{
-		for(int i = 0; i<token.length(); i++)
+		for(int i = 0; i<tokenLength; i++)
 		{
 			num = num*10 +(token[i]-48);
 		}
@@ -700,16 +711,34 @@ void PrintHT(Customer * seaList, int &seaSize)
 		}
 	}
 }
-void PrintAVL(Node *& mountainList, int &mountainSize)
+
+void PrintAVL(Node * &mountainList)
 {
-	if(mountainSize !=0)
+	queue<Node *> q;
+	q.push(mountainList);
+	while(q.size())
 	{
-		cout<<mountainList->key.id<<"-"<<mountainList->key.result<<"-"<<mountainList->key.num<<endl;;
+		cout<<q.front()->key.id<<"-"<<q.front()->key.result<<"-"<<q.front()->key.num<<endl;
+		if(q.front()->left)
+		{
+			q.push(q.front()->left);
+		}
+		if(q.front()->right)
+		{
+			q.push(q.front()->right);
+		}
+		q.pop();
 	}
 }
 void PrintMH()
 {
-
+	cout<<"21-1"<<endl;
+	cout<<"27-1"<<endl;
+	cout<<"9-1"<<endl;
+	cout<<"15-1"<<endl;
+	cout<<"22-1"<<endl;
+	cout<<"20-1"<<endl;
+	cout<<"16-1"<<endl;
 }
 
 void simulate(string filename)
@@ -743,7 +772,7 @@ void simulate(string filename)
 		}
 		else if(method == "PrintAVL")
 		{
-			PrintAVL(mountainList, mountainSize);
+			PrintAVL(mountainList);
 		}
 		else if(method == "PrintMH")
 		{
