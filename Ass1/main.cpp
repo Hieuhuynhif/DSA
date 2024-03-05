@@ -24,7 +24,5 @@
 int main()
 {
     // tc1();
-    Dataset *t = new Dataset();
-    t->columns();
     return 0;
 }
