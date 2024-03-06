@@ -24,15 +24,24 @@ template <typename T>
 class DLinkedList : public List<T>
 {
 public:
-    class Node;
-
-private:
+    class Node; // Forward declaration
+protected:
     Node *head;
     Node *tail;
     int count;
 
 public:
     DLinkedList();
+    ~DLinkedList();
+    void push_back(T value);
+    void push_front(T value);
+    void insert(int index, T value);
+    void remove(int index);
+    T &get(int index) const;
+    int length() const;
+    void clear();
+    void print() const;
+    void reverse();
 
 public:
     class Node
@@ -40,21 +49,21 @@ public:
     private:
         T data;
         Node *next;
-        Node *previous;
+        Node *prev;
         friend class DLinkedList<T>;
 
     public:
         Node()
         {
-            this->previous = nullptr;
-            this->next = nullptr;
+            this->prev = NULL;
+            this->next = NULL;
         }
 
         Node(const T &data)
         {
             this->data = data;
-            this->previous = nullptr;
-            this->next = nullptr;
+            this->prev = NULL;
+            this->next = NULL;
         }
     };
 };
@@ -63,6 +72,7 @@ class Dataset
 {
 private:
     List<List<int> *> *data;
+    List<string> *label;
     // You may need to define more
 public:
     Dataset();
@@ -76,12 +86,18 @@ public:
     void columns() const;
     bool drop(int axis = 0, int index = 0, std::string columns = "");
     Dataset extract(int startRow = 0, int endRow = -1, int startCol = 0, int endCol = -1) const;
+    List<List<int> *> *getData() const;
+
+    void pushRow(List<int> *row);
+    void setLabel(List<string> *&label);
 };
 
 class kNN
 {
 private:
     int k;
+    Dataset xTrain;
+    Dataset yTrain;
     // You may need to define more
 public:
     kNN(int k = 5);
