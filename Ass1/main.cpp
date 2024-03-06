@@ -1,6 +1,7 @@
 #include "kNN.hpp"
 
-void tc1(){
+void tc1()
+{
     Dataset dataset;
     dataset.loadFromCSV("mnist.csv");
     // dataset.printHead();
@@ -10,10 +11,15 @@ void tc1(){
     dataset.getShape(nRows, nCols);
     cout << "Shape: " << nRows << "x" << nCols << endl;
 
-    dataset.extract(0,6,0,4).printHead(9,8);
+    Dataset feature = dataset.extract(0, -1, 1, -1);
+    feature.getShape(nRows, nCols);
+    cout << "Feature shape: " << nRows << "x" << nCols << endl;
 
+    Dataset label = dataset.extract(0, -1, 0, 0);
+    label.getShape(nRows, nCols);
+    cout << "Label shape: " << nRows << "x" << nCols << endl;
 
-    kNN knn;
+    // kNN knn;
     // Dataset X_train, X_test, y_train, y_test;
     // Dataset feature = dataset.extract(0, -1, 1, -1);
     // Dataset label = dataset.extract(0, -1, 0, 0);
@@ -25,7 +31,8 @@ void tc1(){
     // cout << "Accuracy: " << accuracy << endl;
 }
 
-int main() {
+int main()
+{
     tc1();
     return 0;
 }

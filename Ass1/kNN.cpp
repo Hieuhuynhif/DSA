@@ -307,6 +307,7 @@ void Dataset::getShape(int &nRows, int &nCols) const
         if (row->length() > nCols)
             nCols = row->length();
     }
+    // if(label) nCols++;
 };
 void Dataset::columns() const
 {
@@ -351,7 +352,8 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
         int colLabel = endCol;
         List<string> *newLabel = new DLinkedList<string>();
         if (endCol == -1)
-            colLabel = label->length();
+            colLabel = label->length()-1;
+            
         for (int i = startCol; i <= colLabel; i++)
         {
             newLabel->push_back(label->get(i));
@@ -361,18 +363,17 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
 
     if (endRow == -1)
         endRow = data->length();
+
     for (int i = startRow; i < endRow; i++)
     {
         List<int> *row = new DLinkedList<int>();
+        int col = endCol;
         if (endCol == -1)
-            endCol = data->get(i)->length();
-        for (int j = startCol; j <= endCol; j++)
+            col = data->get(i)->length()-1;
+        for (int j = startCol; j <= col; j++)
         {
             row->push_back(data->get(i)->get(j));
-            
         }
-        row->print();
-        cout<<" - ";
         extract.pushRow(row);
     }
     return extract;
@@ -388,7 +389,7 @@ void Dataset::pushRow(List<int> *row)
 void Dataset::setLabel(List<string> *&newLabel)
 {
     label = newLabel;
-}
+};
 
 kNN::kNN(int k)
 {
@@ -409,7 +410,4 @@ double kNN::score(const Dataset &y_test, const Dataset &y_pred)
 };
 
 void train_test_split(Dataset &X, Dataset &y, double test_size,
-                      Dataset &X_train, Dataset &X_test, Dataset &y_train, Dataset &y_test)
-{
-    cout << "asd";
-};
+                      Dataset &X_train, Dataset &X_test, Dataset &y_train, Dataset &y_test){};
