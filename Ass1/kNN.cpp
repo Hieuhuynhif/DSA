@@ -15,6 +15,7 @@ DLinkedList<T>::~DLinkedList()
 {
     this->clear();
     delete head;
+    delete tail;
 }
 
 template <typename T>
@@ -69,6 +70,7 @@ void DLinkedList<T>::insert(int index, T value)
         temp->prev->next->prev = temp->prev;
         temp->prev->next->next = temp;
         temp->prev = temp->prev->next;
+        count++;
     }
 };
 
@@ -83,6 +85,7 @@ void DLinkedList<T>::remove(int index)
         head = head->next;
         head->prev = nullptr;
         delete temp;
+        count--;
     }
     else if (index == count - 1)
     {
@@ -90,6 +93,7 @@ void DLinkedList<T>::remove(int index)
         tail = tail->prev;
         tail->next = nullptr;
         delete temp;
+        count--;
     }
     else
     {
@@ -101,6 +105,7 @@ void DLinkedList<T>::remove(int index)
         temp->prev->next = temp->next;
         temp->next->prev = temp->prev;
         delete temp;
+        count--;
     }
 };
 
@@ -174,17 +179,20 @@ Dataset::Dataset()
     data = new DLinkedList<List<int> *>();
     label = new DLinkedList<string>();
 };
-Dataset::~Dataset()
-{
-    delete data;
+Dataset::~Dataset(){
+    // delete data;
+    // delete label;
 };
 Dataset::Dataset(const Dataset &other)
 {
     data = other.data;
+    label = other.label;
 };
 
 Dataset &Dataset::operator=(const Dataset &other)
 {
+    delete data;
+    delete label;
     data = other.data;
     label = other.label;
     return *this;
@@ -307,7 +315,6 @@ void Dataset::getShape(int &nRows, int &nCols) const
         if (row->length() > nCols)
             nCols = row->length();
     }
-    // if(label) nCols++;
 };
 void Dataset::columns() const
 {
@@ -347,19 +354,16 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
 {
     Dataset extract;
 
-    if (startRow == 0)
+    int colLabel = endCol;
+    List<string> *newLabel = new DLinkedList<string>();
+    if (endCol == -1)
+        colLabel = label->length() - 1;
+
+    for (int i = startCol; i <= colLabel; i++)
     {
-        int colLabel = endCol;
-        List<string> *newLabel = new DLinkedList<string>();
-        if (endCol == -1)
-            colLabel = label->length()-1;
-            
-        for (int i = startCol; i <= colLabel; i++)
-        {
-            newLabel->push_back(label->get(i));
-        }
-        extract.setLabel(newLabel);
+        newLabel->push_back(label->get(i));
     }
+    extract.setLabel(newLabel);
 
     if (endRow == -1)
         endRow = data->length();
@@ -369,7 +373,7 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
         List<int> *row = new DLinkedList<int>();
         int col = endCol;
         if (endCol == -1)
-            col = data->get(i)->length()-1;
+            col = data->get(i)->length() - 1;
         for (int j = startCol; j <= col; j++)
         {
             row->push_back(data->get(i)->get(j));
@@ -395,19 +399,109 @@ kNN::kNN(int k)
 {
     this->k = k;
 };
+
 void kNN::fit(const Dataset &X_train, const Dataset &y_train)
 {
     xTrain = X_train;
     yTrain = y_train;
 };
+
 Dataset kNN::predict(const Dataset &X_test)
 {
-    return X_test;
-};
+    Dataset y_pred;
+    List<string> *label = new DLinkedList<string>();
+
+    label->push_back("label");
+    y_pred.setLabel(label);
+    for (int i = 0; i < X_test.getData()->length(); i++)
+    {
+        List<int> *testRow = X_test.getData()->get(i);
+        List<int> *row = new DLinkedList<int>();
+        int lenTrain = xTrain.getData()->length();
+
+        int labels[lenTrain];
+        for (int i = 0; i < yTrain.getData()->length(); i++)
+        {
+            labels[i] = yTrain.getData()->get(i)->get(0);
+        }
+        double distances[lenTrain];
+
+        int index = 0;
+        for (int j = 0; j < xTrain.getData()->length(); j++)
+        {
+            List<int> *trainRow = xTrain.getData()->get(j);
+            double distance = 0.0;
+            for (int m = 0; m < trainRow->length(); m++)
+            {
+                distance = distance + 1.0 * pow((1.0 * testRow->get(m) - 1.0 * trainRow->get(m)), 2);
+            }
+            distances[index] = sqrt(distance);
+            index++;
+        }
+
+        for (int i = 0; i < k; i++)
+        {
+            int t = i;
+            for (int j = i + 1; j < index; j++)
+            {
+                if (distances[j] < distances[t])
+                    t = j;
+            }
+            if (t != i)
+            {
+                double temp = distances[i];
+                distances[i] = distances[t];
+                distances[t] = temp;
+
+                int tempp = labels[i];
+                labels[i] = labels[t];
+                labels[t] = tempp;
+            }
+        }
+        int element;
+        int max = 0;
+        for (int i = 0; i < k; i++)
+        {
+            int counter = 0;
+            for (int j = i; j < k; j++)
+            {
+                if (labels[j] == labels[i])
+                    counter++;
+            }
+            if (counter > max)
+            {
+                max = counter;
+                element = labels[i];
+            }
+        }
+        row->push_back(element);
+        y_pred.pushRow(row);
+    }
+    return y_pred;
+}
+
 double kNN::score(const Dataset &y_test, const Dataset &y_pred)
 {
-    return 0.05;
+    int counter = 0;
+    for (int i = 0; i < y_test.getData()->length(); i++)
+    {
+        if (y_test.getData()->get(i)->get(0) == y_pred.getData()->get(i)->get(0))
+            counter++;
+    }
+    double accuracy = (counter * 1.0 - 1) / (y_test.getData()->length());
+    // cout<<counter<<"--"<<y_pred.getData()->length()<<endl;
+    // cout << accuracy;
+    return accuracy;
 };
 
 void train_test_split(Dataset &X, Dataset &y, double test_size,
-                      Dataset &X_train, Dataset &X_test, Dataset &y_train, Dataset &y_test){};
+                      Dataset &X_train, Dataset &X_test, Dataset &y_train, Dataset &y_test)
+{
+    int nRows, nCols;
+    X.getShape(nRows, nCols);
+    int rows = nRows * (1 - test_size);
+    X_train = X.extract(0, rows, 0, -1);
+    y_train = y.extract(0, rows, 0, -1);
+    X_test = X.extract(rows, -1, 0, -1);
+    y_test = y.extract(rows, -1, 0, -1);
+};
