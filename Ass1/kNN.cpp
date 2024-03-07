@@ -484,7 +484,7 @@ double kNN::score(const Dataset &y_test, const Dataset &y_pred)
         if (y_test.getData()->get(i)->get(0) == y_pred.getData()->get(i)->get(0))
             counter++;
     }
-    double accuracy = (counter * 1.0 - 1) / (y_test.getData()->length());
+    double accuracy = (counter * 1.0) / (y_test.getData()->length());
 
     return accuracy;
 };
