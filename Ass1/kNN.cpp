@@ -354,27 +354,23 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
 {
     Dataset extract;
 
-    int colLabel = endCol;
     List<string> *newLabel = new DLinkedList<string>();
     if (endCol == -1)
-        colLabel = label->length() - 1;
+        endCol = label->length() - 1;
+    if (endRow == -1)
+        endRow = data->length();
 
-    for (int i = startCol; i <= colLabel; i++)
+    for (int i = startCol; i <= endCol; i++)
     {
         newLabel->push_back(label->get(i));
     }
     extract.setLabel(newLabel);
 
-    if (endRow == -1)
-        endRow = data->length();
-
     for (int i = startRow; i < endRow; i++)
     {
         List<int> *row = new DLinkedList<int>();
-        int col = endCol;
-        if (endCol == -1)
-            col = data->get(i)->length() - 1;
-        for (int j = startCol; j <= col; j++)
+
+        for (int j = startCol; j <= endCol; j++)
         {
             row->push_back(data->get(i)->get(j));
         }
@@ -489,8 +485,7 @@ double kNN::score(const Dataset &y_test, const Dataset &y_pred)
             counter++;
     }
     double accuracy = (counter * 1.0 - 1) / (y_test.getData()->length());
-    // cout<<counter<<"--"<<y_pred.getData()->length()<<endl;
-    // cout << accuracy;
+
     return accuracy;
 };
 
