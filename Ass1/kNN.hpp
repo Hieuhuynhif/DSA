@@ -89,7 +89,6 @@ public:
     List<List<int> *> *getData() const;
     void pushRow(List<int> *row);
     void setLabel(List<string> *&newLabel);
-
 };
 
 class kNN

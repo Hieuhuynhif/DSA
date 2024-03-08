@@ -414,24 +414,25 @@ Dataset kNN::predict(const Dataset &X_test)
         List<int> *testRow = X_test.getData()->get(i);
         List<int> *row = new DLinkedList<int>();
         int lenTrain = xTrain.getData()->length();
-
         int labels[lenTrain];
+
         for (int i = 0; i < yTrain.getData()->length(); i++)
         {
             labels[i] = yTrain.getData()->get(i)->get(0);
         }
         double distances[lenTrain];
-
         int index = 0;
+
         for (int j = 0; j < xTrain.getData()->length(); j++)
         {
             List<int> *trainRow = xTrain.getData()->get(j);
             double distance = 0.0;
             for (int m = 0; m < trainRow->length(); m++)
             {
-                distance = distance + 1.0 * pow((1.0 * testRow->get(m) - 1.0 * trainRow->get(m)), 2);
+                distance = distance + pow((testRow->get(m) - trainRow->get(m)), 2);
             }
-            distances[index] = 1.0 * sqrt(distance);
+
+            distances[index] = sqrt(distance);
             index++;
         }
 
