@@ -458,7 +458,7 @@ Dataset kNN::predict(const Dataset &X_test)
         for (int i = 0; i < k; i++)
         {
             int counter = 0;
-            for (int j = 0; j < k; j++)
+            for (int j = i; j < k; j++)
             {
                 if (labels[j] == labels[i])
                     counter++;
@@ -478,13 +478,13 @@ Dataset kNN::predict(const Dataset &X_test)
 
 double kNN::score(const Dataset &y_test, const Dataset &y_pred)
 {
-    int counter = 0;
+    int hit = 0;
     for (int i = 0; i < y_test.getData()->length(); i++)
     {
         if (y_test.getData()->get(i)->get(0) == y_pred.getData()->get(i)->get(0))
-            counter++;
+            hit++;
     }
-    double accuracy = (counter * 1.0) / y_test.getData()->length();
+    double accuracy = (hit * 1.0 ) / y_test.getData()->length();
 
     return accuracy;
 };
