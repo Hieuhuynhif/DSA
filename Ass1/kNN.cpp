@@ -438,29 +438,27 @@ Dataset kNN::predict(const Dataset &X_test)
 
         for (int i = 0; i < k; i++)
         {
-            int t = i;
-            for (int j = i + 1; j < index; j++)
+            for (int j = index - 1; j > i; j--)
             {
-                if (distances[j] < distances[t])
-                    t = j;
-            }
-            if (t != i)
-            {
-                double temp = distances[i];
-                distances[i] = distances[t];
-                distances[t] = temp;
+                if (distances[j - 1] > distances[j])
+                {
+                    double temp = distances[j];
+                    distances[j] = distances[j - 1];
+                    distances[j - 1] = temp;
 
-                int tempp = labels[i];
-                labels[i] = labels[t];
-                labels[t] = tempp;
+                    int label = labels[j];
+                    labels[j] = labels[j - 1];
+                    labels[j - 1] = label;
+                }
             }
         }
+
         int element;
         int max = 0;
         for (int i = 0; i < k; i++)
         {
             int counter = 0;
-            for (int j = i; j < k; j++)
+            for (int j = 0; j < k; j++)
             {
                 if (labels[j] == labels[i])
                     counter++;
@@ -474,6 +472,7 @@ Dataset kNN::predict(const Dataset &X_test)
         row->push_back(element);
         y_pred.pushRow(row);
     }
+
     return y_pred;
 }
 
