@@ -427,7 +427,7 @@ Dataset kNN::predict(const Dataset &X_test)
         {
             List<int> *trainRow = xTrain.getData()->get(j);
             double distance = 0.0;
-            for (int m = 0; m < trainRow->length(); m++)
+            for (int m = 0; m < testRow->length(); m++)
             {
                 distance = distance + pow((testRow->get(m) - trainRow->get(m)), 2);
             }
