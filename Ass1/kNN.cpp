@@ -438,7 +438,7 @@ Dataset kNN::predict(const Dataset &X_test)
 
         for (int i = 0; i < k; i++)
         {
-            for (int j = index - 1; j > 0; j--)
+            for (int j = index - 1; j > i; j--)
             {
                 if (distances[j - 1] > distances[j])
                 {
