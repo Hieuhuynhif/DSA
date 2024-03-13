@@ -416,9 +416,9 @@ Dataset kNN::predict(const Dataset &X_test)
         int lenTrain = xTrain.getData()->length();
         int labels[lenTrain];
 
-        for (int ii = 0; ii < yTrain.getData()->length(); ii++)
+        for (int i = 0; i < yTrain.getData()->length(); i++)
         {
-            labels[ii] = yTrain.getData()->get(i)->get(0);
+            labels[i] = yTrain.getData()->get(i)->get(0);
         }
         double distances[lenTrain];
         int index = 0;
@@ -436,19 +436,19 @@ Dataset kNN::predict(const Dataset &X_test)
             index++;
         }
 
-        for (int iii = 0; iii < k; iii++)
+        for (int i = 0; i < k; i++)
         {
-            for (int jj = index - 1; jj > iii; jj--)
+            for (int j = index - 1; j > i; j--)
             {
-                if (distances[jj - 1] > distances[jj])
+                if (distances[j - 1] > distances[j])
                 {
-                    double temp = distances[jj];
-                    distances[jj] = distances[jj - 1];
-                    distances[jj - 1] = temp;
+                    double temp = distances[j];
+                    distances[j] = distances[j - 1];
+                    distances[j - 1] = temp;
 
-                    int label = labels[jj];
-                    labels[jj] = labels[jj - 1];
-                    labels[jj - 1] = label;
+                    int label = labels[j];
+                    labels[j] = labels[j - 1];
+                    labels[j - 1] = label;
                 }
             }
         }
