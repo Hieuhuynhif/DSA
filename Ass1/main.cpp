@@ -26,8 +26,11 @@ void tc1()
   cout << "Accuracy: " << accuracy << endl;
 }
 
+
+
 int main()
 {
   tc1();
+
   return 0;
 }

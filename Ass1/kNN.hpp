@@ -72,8 +72,8 @@ class Dataset
 {
 private:
     List<List<int> *> *data;
-    List<string> *label;
     // You may need to define more
+    List<string> *label;
 public:
     Dataset();
     ~Dataset();
