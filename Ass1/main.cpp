@@ -36,11 +36,11 @@ void tc1126()
 
 void tc1143()
 {
-int nRows, nCols;
-Dataset dataset;
-dataset.loadFromCSV("mnist.csv");
-bool result = dataset.drop(0, 0);
-cout << "Drop(0,0) result: " << result;
+  int nRows, nCols;
+  Dataset dataset;
+  dataset.loadFromCSV("mnist.csv");
+  bool result = dataset.drop(0, 0);
+  cout << "Drop(0,0) result: " << result;
 }
 
 int main()
