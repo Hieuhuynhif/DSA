@@ -146,14 +146,17 @@ void DLinkedList<T>::clear()
 template <typename T>
 void DLinkedList<T>::print() const
 {
+    if (count == 0)
+        cout << "";
     Node *temp = head;
     while (temp)
     {
         cout << temp->data;
-        if (temp->next)
-            cout << " ";
+        // if (temp->next)
+        cout << " ";
         temp = temp->next;
     }
+    cout << endl;
 };
 
 template <typename T>
@@ -279,7 +282,7 @@ void Dataset::printTail(int nRows, int nCols) const
     for (int i = label->length() - nColsLabel; i < label->length(); i++)
     {
         cout << label->get(i);
-        if (i + 1 != nColsLabel)
+        if (i + 1 != label->length())
             cout << " ";
     }
 
@@ -297,7 +300,7 @@ void Dataset::printTail(int nRows, int nCols) const
         for (int i = row->length() - cols; i < row->length(); i++)
         {
             cout << row->get(i);
-            if (i + 1 != cols)
+            if (i + 1 != row->length())
                 cout << " ";
         }
         if (i + 1 != data->length())
@@ -322,17 +325,19 @@ void Dataset::columns() const
 };
 bool Dataset::drop(int axis, int index, std::string columns)
 {
-    if (axis != 0 || axis != 1)
+    if (axis != 0 && axis != 1)
         return false;
 
-    if (axis == 0)
+    else if (axis == 0)
     {
-        if (index < 0 || index > data->length())
+        if (index < 0 || index >= data->length())
             return false;
 
         data->remove(index);
+        return true;
     }
-    if (axis == 1)
+
+    else
     {
         for (int i = 0; i < data->length(); i++)
         {
@@ -348,7 +353,6 @@ bool Dataset::drop(int axis, int index, std::string columns)
         }
         return false;
     }
-    return true;
 };
 Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) const
 {
