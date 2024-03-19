@@ -350,8 +350,6 @@ bool Dataset::drop(int axis, int index, std::string columns)
 };
 Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) const
 {
-    Dataset extract;
-    List<string> *newLabel = new DLinkedList<string>();
 
     if (endCol == -1)
         endCol = label->length() - 1;
@@ -365,6 +363,9 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
         throw out_of_range("get(): Out of range");
     else if (endRow < startRow)
         throw out_of_range("get(): Out of range");
+
+    Dataset extract;
+    List<string> *newLabel = new DLinkedList<string>();
 
     for (int i = startCol; i <= endCol; i++)
     {
