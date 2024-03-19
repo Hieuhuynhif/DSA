@@ -28,12 +28,12 @@ void tc1()
 
 void tc()
 {
-int nRows, nCols;
-Dataset dataset;
-dataset.loadFromCSV("mnist.csv");
-Dataset dataset2 = Dataset(dataset);
-bool result = dataset2.drop(1, 0, "label");
-cout << "Drop(1, \"label\") result: " << result << endl;
+  int nRows, nCols;
+  Dataset dataset;
+  dataset.loadFromCSV("mnist.csv");
+  Dataset dataset2 = Dataset(dataset);
+  bool result = dataset2.drop(1, 0, "label");
+  cout << "Drop(1, \"label\") result: " << result << endl;
 }
 
 int main()
