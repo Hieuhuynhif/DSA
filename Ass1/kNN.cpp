@@ -310,14 +310,7 @@ void Dataset::printTail(int nRows, int nCols) const
 void Dataset::getShape(int &nRows, int &nCols) const
 {
     nRows = data->length();
-    nCols = 0;
-    List<int> *row;
-    for (int i = 0; i < data->length(); i++)
-    {
-        row = data->get(i);
-        if (row->length() > nCols)
-            nCols = row->length();
-    }
+    nCols = label->length();
 };
 void Dataset::columns() const
 {
@@ -344,10 +337,11 @@ bool Dataset::drop(int axis, int index, std::string columns)
             if (label->get(i) == columns)
             {
                 int idx = i;
-                for (int j = 0; i < data->length(); j++)
+                for (int j = 0; j < data->length(); j++)
                 {
                     data->get(j)->remove(idx);
                 }
+                label->remove(idx);
                 return true;
             }
         }
@@ -357,12 +351,20 @@ bool Dataset::drop(int axis, int index, std::string columns)
 Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) const
 {
     Dataset extract;
-
     List<string> *newLabel = new DLinkedList<string>();
+
     if (endCol == -1)
         endCol = label->length() - 1;
+    else if (endCol < -1)
+        throw out_of_range("get(): Out of range");
+    else if (endCol < startCol)
+        throw out_of_range("get(): Out of range");
     if (endRow == -1)
         endRow = data->length() - 1;
+    else if (endRow < -1)
+        throw out_of_range("get(): Out of range");
+    else if (endRow < startRow)
+        throw out_of_range("get(): Out of range");
 
     for (int i = startCol; i <= endCol; i++)
     {
@@ -498,9 +500,10 @@ void train_test_split(Dataset &X, Dataset &y, double test_size,
 {
     int nRows, nCols;
     X.getShape(nRows, nCols);
-    int rows = nRows * (1 - test_size);
-    X_train = X.extract(0, rows, 0, -1);
-    y_train = y.extract(0, rows, 0, -1);
-    X_test = X.extract(rows, -1, 0, -1);
-    y_test = y.extract(rows, -1, 0, -1);
+    int nRowTrain = ceil(nRows * test_size);
+    X_train = X.extract(0, nRows - nRowTrain - 1, 0, -1);
+    X_test = X.extract(nRows - nRowTrain, -1, 0, -1);
+
+    y_train = y.extract(0, nRows - nRowTrain - 1, 0, -1);
+    y_test = y.extract(nRows - nRowTrain, -1, 0, -1);
 };

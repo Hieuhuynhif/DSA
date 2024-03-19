@@ -26,15 +26,14 @@ void tc1()
   cout << "Accuracy: " << accuracy << endl;
 }
 
-
-
 void tc()
 {
 int nRows, nCols;
 Dataset dataset;
 dataset.loadFromCSV("mnist.csv");
-bool result = dataset.drop(1, 0, "27x28");
-cout << "Drop(1, \"27x28\") result: " << result << endl;
+Dataset dataset2 = Dataset(dataset);
+bool result = dataset2.drop(1, 0, "label");
+cout << "Drop(1, \"label\") result: " << result << endl;
 }
 
 int main()
