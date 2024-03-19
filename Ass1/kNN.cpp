@@ -339,14 +339,14 @@ bool Dataset::drop(int axis, int index, std::string columns)
 
     else
     {
-        for (int i = 0; i < data->length(); i++)
+        for (int i = 0; i < label->length(); i++)
         {
             if (label->get(i) == columns)
             {
-                int index = i;
-                for (int i = 0; i < data->length(); i++)
+                int idx = i;
+                for (int j = 0; i < data->length(); j++)
                 {
-                    data->get(i)->remove(index);
+                    data->get(j)->remove(idx);
                 }
                 return true;
             }
@@ -362,7 +362,7 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
     if (endCol == -1)
         endCol = label->length() - 1;
     if (endRow == -1)
-        endRow = data->length();
+        endRow = data->length() - 1;
 
     for (int i = startCol; i <= endCol; i++)
     {
@@ -370,7 +370,7 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
     }
     extract.setLabel(newLabel);
 
-    for (int i = startRow; i < endRow; i++)
+    for (int i = startRow; i <= endRow; i++)
     {
         List<int> *row = new DLinkedList<int>();
 

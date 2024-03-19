@@ -26,27 +26,21 @@ void tc1()
   cout << "Accuracy: " << accuracy << endl;
 }
 
-void tc1126()
-{
-  Dataset dataset;
-  dataset.loadFromCSV("mnist.csv");
-  dataset.printTail();
-  dataset.printTail();
-}
 
-void tc1143()
+
+void tc()
 {
-  int nRows, nCols;
-  Dataset dataset;
-  dataset.loadFromCSV("mnist.csv");
-  bool result = dataset.drop(0, 0);
-  cout << "Drop(0,0) result: " << result;
+int nRows, nCols;
+Dataset dataset;
+dataset.loadFromCSV("mnist.csv");
+bool result = dataset.drop(1, 0, "27x28");
+cout << "Drop(1, \"27x28\") result: " << result << endl;
 }
 
 int main()
 {
   // tc1();
 
-  tc1143();
+  tc();
   return 0;
 }
