@@ -152,11 +152,10 @@ void DLinkedList<T>::print() const
     while (temp)
     {
         cout << temp->data;
-        // if (temp->next)
-        cout << " ";
+        if (temp->next)
+            cout << " ";
         temp = temp->next;
     }
-    cout << endl;
 };
 
 template <typename T>
@@ -182,22 +181,61 @@ Dataset::Dataset()
     data = new DLinkedList<List<int> *>();
     label = new DLinkedList<string>();
 };
-Dataset::~Dataset(){
-    // delete data;
-    // delete label;
+Dataset::~Dataset()
+{
+    delete data;
+    delete label;
 };
 Dataset::Dataset(const Dataset &other)
 {
-    data = other.data;
-    label = other.label;
+
+    data = new DLinkedList<List<int> *>();
+    label = new DLinkedList<string>();
+
+    List<string> *tempLabel = other.getLabel();
+
+    for (int i = 0; i < tempLabel->length(); i++)
+        label->push_back(tempLabel->get(i));
+
+    List<List<int> *> *tempData = other.getData();
+    for (int i = 0; i < tempData->length(); i++)
+    {
+        List<int> *temp = tempData->get(i);
+        List<int> *row = new DLinkedList<int>();
+
+        for (int j = 0; j < temp->length(); j++)
+            row->push_back(temp->get(j));
+
+        data->push_back(row);
+    }
 };
 
 Dataset &Dataset::operator=(const Dataset &other)
 {
+
     delete data;
     delete label;
-    data = other.data;
-    label = other.label;
+
+    data = new DLinkedList<List<int> *>();
+    label = new DLinkedList<string>();
+
+    List<string> *tempLabel = other.getLabel();
+
+    for (int i = 0; i < tempLabel->length(); i++)
+        label->push_back(tempLabel->get(i));
+
+    List<List<int> *> *tempData = other.getData();
+    for (int i = 0; i < tempData->length(); i++)
+    {
+        List<int> *temp = tempData->get(i);
+        List<int> *row = new DLinkedList<int>();
+
+        for (int j = 0; j < temp->length(); j++)
+            row->push_back(temp->get(j));
+
+        data->push_back(row);
+    }
+
     return *this;
 };
 bool Dataset::loadFromCSV(const char *fileName)
@@ -388,6 +426,10 @@ Dataset Dataset::extract(int startRow, int endRow, int startCol, int endCol) con
 List<List<int> *> *Dataset::getData() const
 {
     return data;
+};
+List<string> *Dataset::getLabel() const
+{
+    return label;
 };
 void Dataset::pushRow(List<int> *row)
 {

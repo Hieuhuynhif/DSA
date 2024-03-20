@@ -74,6 +74,7 @@ private:
     List<List<int> *> *data;
     // You may need to define more
     List<string> *label;
+
 public:
     Dataset();
     ~Dataset();
@@ -87,6 +88,7 @@ public:
     bool drop(int axis = 0, int index = 0, std::string columns = "");
     Dataset extract(int startRow = 0, int endRow = -1, int startCol = 0, int endCol = -1) const;
     List<List<int> *> *getData() const;
+    List<string> *getLabel() const;
     void pushRow(List<int> *row);
     void setLabel(List<string> *&newLabel);
 };
