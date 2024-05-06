@@ -86,13 +86,14 @@ void tc5()
     train_test_split(feature, label, 0.2, X_train, X_test, y_train, y_test);
     knn.fit(X_train, y_train);
     Dataset y_pred = knn.predict(X_test);
+    y_pred.printHead(10, 12);
     double accuracy = knn.score(y_test, y_pred);
     std::cout << "Accuracy: " << accuracy << endl;
 }
 
 int main(int argc, const char *argv[])
 {
-    tc1();
+    tc5();
 
     return 0;
 }

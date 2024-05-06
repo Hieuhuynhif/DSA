@@ -52,6 +52,10 @@ private:
     Dataset *y_train;
     int numClasses;
 
+    kDTree *xTrainKDT;
+    vector<vector<int>> xTrainVT;
+    vector<vector<int>> yTrainVT;
+
 public:
     kNN(int k = 5);
     void fit(Dataset &X_train, Dataset &y_train);
