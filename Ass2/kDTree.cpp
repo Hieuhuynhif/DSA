@@ -482,6 +482,7 @@ void insertIntoBestList(vector<kDTreeNode *> &bestList, kDTreeNode *node, const 
     }
     // Find the farthest node in the list
     double farthestDist = distance(target, bestList.back()->data);
+
     // If the current node is closer than the farthest node in the list, replace it
     if (currentDist < farthestDist)
     {
@@ -512,6 +513,7 @@ void kNearestNeighbourHelper(const vector<int> &target, int k, kDTreeNode *curre
 
     // Recurse into children based on axis
     int axis = current->data.size() % target.size(); // Select axis based on dimension
+
     double axisDist = target[axis] - current->data[axis];
 
     kDTreeNode *nearChild = (axisDist < 0) ? current->left : current->right;
