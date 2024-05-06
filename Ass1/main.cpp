@@ -38,8 +38,7 @@ void tc()
 
 int main()
 {
-  // tc1();
 
-  tc();
+  tc1();
   return 0;
 }
