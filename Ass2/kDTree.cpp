@@ -457,7 +457,6 @@ void kNearestNeighbourHelper(const vector<int> &target, int k, vector<kDTreeNode
 
     // Calculate distance between target and current node
     int distance = calculateDistance(target, node->data, dimensions);
-
     // Update bestList if necessary
     if (bestList.size() < k || distance < calculateDistance(target, bestList.back()->data, dimensions))
     {
@@ -473,7 +472,6 @@ void kNearestNeighbourHelper(const vector<int> &target, int k, vector<kDTreeNode
         }
         bestList.insert(it, node);
     }
-
     // Decide which subtree to explore first based on the dimension of the current node
     int dim = depth % k;
     if (target[dim] < node->data[dim])
