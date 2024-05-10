@@ -584,7 +584,7 @@ Dataset kNN::predict(Dataset &X_test)
                     break;
                 }
             }
-            if (index != 0)
+            if (index != -1)
             {
                 labels.push_back(index);
             }
