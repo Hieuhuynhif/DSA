@@ -65,6 +65,7 @@ private:
     int k;
 
     kDTree *xTrainKDT;
+    // vector xTrain and yTrain
     vector<vector<int>> xTrainVT;
     vector<vector<int>> yTrainVT;
 

@@ -12,6 +12,7 @@ kDTree::kDTree(int k)
 }
 
 //
+// deepCopy function
 kDTreeNode *deepCopy(const kDTreeNode *node)
 {
     if (node == nullptr)
@@ -55,6 +56,7 @@ kDTree const &kDTree::operator=(const kDTree &other)
 }
 
 //
+// Helper function
 void inorderHelper(kDTreeNode *root)
 {
     if (root == nullptr)
@@ -81,6 +83,7 @@ void kDTree::inorderTraversal() const
 }
 
 //
+// Helper function
 void preorderHelper(kDTreeNode *root)
 {
 
@@ -109,6 +112,7 @@ void kDTree::preorderTraversal() const
 }
 
 //
+// Helper function
 void postorderHelper(kDTreeNode *root)
 {
     if (root == nullptr)
@@ -135,23 +139,25 @@ void kDTree::postorderTraversal() const
 }
 
 //
-int getHeight(kDTreeNode *root)
+// Helper function
+int getHeightHelper(kDTreeNode *root)
 {
     if (root == nullptr)
         return 0;
 
-    int leftHeight = getHeight(root->left);
-    int rightHeight = getHeight(root->right);
+    int leftHeight = getHeightHelper(root->left);
+    int rightHeight = getHeightHelper(root->right);
 
     return 1 + max(leftHeight, rightHeight);
 }
 
 int kDTree::height() const
 {
-    return getHeight(root);
+    return getHeightHelper(root);
 }
 
 //
+// Helper function
 int nodeCountHelper(kDTreeNode *root)
 {
     if (root == nullptr)
@@ -168,6 +174,7 @@ int kDTree::nodeCount() const
 }
 
 //
+// Helper function
 int leafCountHelper(kDTreeNode *root)
 {
     if (root == nullptr)
@@ -181,7 +188,7 @@ int leafCountHelper(kDTreeNode *root)
     int leftCount = leafCountHelper(root->left);
     int rightCount = leafCountHelper(root->right);
 
-    // Return the total number of leaf nodes in the tree
+    // Return the total number of leaf nodes
     return leftCount + rightCount;
 }
 int kDTree::leafCount() const
@@ -190,6 +197,7 @@ int kDTree::leafCount() const
 }
 
 //
+// Helper function
 kDTreeNode *insertHelper(kDTreeNode *root, const vector<int> &point, int depth, int k)
 {
     if (root == nullptr)
@@ -237,7 +245,8 @@ kDTreeNode *findMin(kDTreeNode *node, int dimension)
 
     return minNode;
 }
-// Function to remove a point from the KD-tree
+
+// Helper function
 kDTreeNode *removeHelper(kDTreeNode *node, const vector<int> &point, int depth, int k)
 {
     if (node == nullptr)
@@ -354,7 +363,7 @@ void mergeSort(vector<vector<int>> &arr, int l, int r, int axis)
     merge(arr, l, m, r, axis);
 }
 
-// Helper function to build the KD-tree recursively
+// Helper function
 kDTreeNode *buildTreeHelper(vector<vector<int>> &pointList, int start, int end, int depth, int k)
 {
     if (start > end)
@@ -364,7 +373,7 @@ kDTreeNode *buildTreeHelper(vector<vector<int>> &pointList, int start, int end, 
 
     int mid = (start + end) / 2;
 
-    // Sort based on current axis using merge sort
+    // Sort based on current axis
     mergeSort(pointList, start, end, axis);
 
     kDTreeNode *node = new kDTreeNode(pointList[mid]);
@@ -455,16 +464,16 @@ void kNearestNeighbourHelper(const vector<int> &target, int k, vector<kDTreeNode
     if (node == nullptr)
         return;
 
-    // Calculate distance between target and current node
+    // Calculate distance between target node and current node
     int distance = calculateDistance(target, node->data, dimensions);
-    // Update bestList if necessary
+    // Update bestList if can
     if (bestList.size() < k || distance < calculateDistance(target, bestList.back()->data, dimensions))
     {
         if (bestList.size() == k)
         {
             bestList.pop_back();
         }
-        // Find the position to insert the new node in bestList to maintain sorted order
+        // Find the position to insert into bestList
         auto it = bestList.begin();
         while (it != bestList.end() && calculateDistance(target, (*it)->data, dimensions) < distance)
         {
@@ -472,7 +481,7 @@ void kNearestNeighbourHelper(const vector<int> &target, int k, vector<kDTreeNode
         }
         bestList.insert(it, node);
     }
-    // Decide which subtree to explore first based on the dimension of the current node
+    // Decide subtree first
     int dim = depth % k;
     if (target[dim] < node->data[dim])
     {
@@ -528,7 +537,7 @@ void kNN::fit(Dataset &X_train, Dataset &y_train)
         yTrainVT.push_back(innerVector);
     }
 
-    // defining
+    // define
     this->xTrainKDT = xTrainKDT;
     this->xTrainVT = xTrainVT;
     this->yTrainVT = yTrainVT;
@@ -562,14 +571,12 @@ Dataset kNN::predict(Dataset &X_test)
 
         for (const auto &node : bestList)
         {
-
             bool found = false;
             int index = -1;
-
-            // Iterate through the vector of vectors
+            // Iterate
             for (int i = 0; i < xTrainVT.size(); ++i)
             {
-                // Compare each inner vector with the target vector
+                // Compare inner vector with  target
                 if (xTrainVT[i] == node->data)
                 {
                     found = true;
@@ -577,7 +584,6 @@ Dataset kNN::predict(Dataset &X_test)
                     break;
                 }
             }
-
             if (index != 0)
             {
                 labels.push_back(index);
