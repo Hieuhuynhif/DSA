@@ -13,7 +13,7 @@
 /*
 ! cách chạy test case
 * cách dùng hàm main.cpp
-* b1 : chạy lệnh g++ -o main main.cpp ID_BTL2_DSA.cpp Dataset.o nếu không gì hiện ra thì không bị lỗi code
+* b1 : chạy lệnh g++ -o main main_TestCase2.cpp kDtree.cpp Dataset.o nếu không gì hiện ra thì không bị lỗi code
 * b2 : chạy lệnh ./main
 */
 
