@@ -389,7 +389,6 @@ void kDTree::buildTree(const vector<vector<int>> &pointList)
 }
 
 //
-
 double distance(const vector<int> &a, const vector<int> &b)
 {
     double dist = 0.0;
@@ -400,87 +399,94 @@ double distance(const vector<int> &a, const vector<int> &b)
     return sqrt(dist);
 }
 
-void nearestNeighbourHelper(kDTreeNode *node, const vector<int> &target, kDTreeNode *&best)
+void nearestNeighbourHelper(kDTreeNode *node, const vector<int> &target, kDTreeNode *&best, int depth, int &k)
 {
     if (node == nullptr)
         return;
 
-    // Determine current axis
-    int axis = target.size() % node->data.size();
+    int index = depth % k;
 
-    // Choose the branch to proceed
-    kDTreeNode *closerSubtree = (target[axis] < node->data[axis]) ? node->left : node->right;
-    kDTreeNode *fartherSubtree = (target[axis] < node->data[axis]) ? node->right : node->left;
-
-    // Recursively search the closer subtree
-    nearestNeighbourHelper(closerSubtree, target, best);
-
-    // If the current node is closer than the stored nearest neighbor, update the nearest neighbor
-    if (best == nullptr || distance(node->data, target) < distance(best->data, target))
-        best = node;
-
-    // Check if need to search the other subtree
-    if (abs(target[axis] - node->data[axis]) < distance(target, best->data))
+    if (target[index] < node->data[index])
     {
-        nearestNeighbourHelper(fartherSubtree, target, best);
+        nearestNeighbourHelper(node->left, target, best, depth + 1, k);
+        double currentDistance = distance(node->data, target);
+        if (best == nullptr || currentDistance < distance(best->data, target))
+        {
+            best = node;
+        }
+        else if (abs(node->data[index] - target[index]) < distance(best->data, target))
+        {
+            nearestNeighbourHelper(node->right, target, best, depth + 1, k);
+        }
+        else
+            return;
+    }
+    else
+    {
+        nearestNeighbourHelper(node->right, target, best, depth + 1, k);
+        double currentDistance = distance(node->data, target);
+        if (best == nullptr || currentDistance < distance(best->data, target))
+        {
+            best = node;
+        }
+        else if (abs(node->data[index] - target[index]) < distance(best->data, target))
+        {
+            nearestNeighbourHelper(node->left, target, best, depth + 1, k);
+        }
+        else
+            return;
     }
 }
 
 void kDTree::nearestNeighbour(const vector<int> &target, kDTreeNode *&best)
 {
-    nearestNeighbourHelper(root, target, best);
+    nearestNeighbourHelper(root, target, best, 0, k);
 }
 
 //
-int calculateDistance(const vector<int> &a, const vector<int> &b, int &k)
-{
-    int distance = 0;
-    for (int i = 0; i < k; ++i)
-    {
-        int diff = a[i] - b[i];
-        distance += diff * diff;
-    }
-    return distance;
-}
+
 void kNearestNeighbourHelper(const vector<int> &target, int k, vector<kDTreeNode *> &bestList, kDTreeNode *node, int depth, int &dimensions)
 {
     if (node == nullptr)
         return;
 
-    // Calculate distance between target node and current node
-    int distance = calculateDistance(target, node->data, dimensions);
-    // Update bestList if can
-    if (bestList.size() < k || distance < calculateDistance(target, bestList.back()->data, dimensions))
-    {
-        if (bestList.size() == k)
-        {
-            bestList.pop_back();
-        }
-        // Find the position to insert into bestList
-        auto it = bestList.begin();
-        while (it != bestList.end() && calculateDistance(target, (*it)->data, dimensions) < distance)
-        {
-            ++it;
-        }
-        bestList.insert(it, node);
-    }
-    // Decide subtree first
-    int dim = depth % k;
-    if (target[dim] < node->data[dim])
+    int index = depth % dimensions;
+
+    if (target[index] < node->data[index])
     {
         kNearestNeighbourHelper(target, k, bestList, node->left, depth + 1, dimensions);
-        if (node->right != nullptr && (bestList.size() < k || pow(target[dim] - node->data[dim], 2) <= calculateDistance(target, bestList.back()->data, dimensions)))
+        double currentDistance = distance(node->data, target);
+        if (bestList.size() < k || currentDistance < distance(bestList.back()->data, target))
         {
-            kNearestNeighbourHelper(target, k, bestList, node->right, depth + 1, dimensions);
+            if (bestList.size() == k)
+                bestList.pop_back();
+
+            auto it = bestList.begin();
+            while (it != bestList.end() && distance(target, (*it)->data) <= currentDistance)
+            {
+                ++it;
+            }
+            bestList.insert(it, node);
         }
+        kNearestNeighbourHelper(target, k, bestList, node->right, depth + 1, dimensions);
     }
     else
     {
         kNearestNeighbourHelper(target, k, bestList, node->right, depth + 1, dimensions);
-        if (node->left != nullptr && (bestList.size() < k || pow(target[dim] - node->data[dim], 2) <= calculateDistance(target, bestList.back()->data, dimensions)))
+        double currentDistance = distance(node->data, target);
+        if (bestList.size() < k || currentDistance < distance(bestList.back()->data, target))
         {
-            kNearestNeighbourHelper(target, k, bestList, node->left, depth + 1, dimensions);
+            if (bestList.size() == k)
+                bestList.pop_back();
+
+            auto it = bestList.begin();
+            while (it != bestList.end() && distance(target, (*it)->data) <= currentDistance)
+            {
+                ++it;
+            }
+            bestList.insert(it, node);
         }
+        kNearestNeighbourHelper(target, k, bestList, node->left, depth + 1, dimensions);
     }
 }
 
