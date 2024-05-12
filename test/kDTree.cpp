@@ -390,62 +390,45 @@ void kDTree::buildTree(const vector<vector<int>> &pointList)
 
 //
 
-double distance(const vector<int> &p1, const vector<int> &p2)
+double distance(const vector<int> &a, const vector<int> &b)
 {
     double dist = 0.0;
-    for (size_t i = 0; i < p1.size(); ++i)
+    for (size_t i = 0; i < a.size(); ++i)
     {
-        dist += pow(p1[i] - p2[i], 2);
+        dist += pow(a[i] - b[i], 2);
     }
     return sqrt(dist);
 }
 
-double minDistToPlane(const vector<int> &target, kDTreeNode *node)
+void nearestNeighbourHelper(kDTreeNode *node, const vector<int> &target, kDTreeNode *&best)
 {
-    double dist = 0.0;
-    for (size_t i = 0; i < target.size(); ++i)
-    {
-        dist += pow(target[i] - node->data[i], 2);
-    }
-    return sqrt(dist);
-}
-
-void nearestNeighbourHelper(const vector<int> &target, kDTreeNode *current, kDTreeNode *&best, double &bestDist, int depth, int k)
-{
-    if (current == nullptr)
+    if (node == nullptr)
         return;
 
-    double currentDist = distance(target, current->data);
+    // Determine current axis
+    int axis = target.size() % node->data.size();
 
-    if (currentDist < bestDist)
-    {
-        best = current;
-        bestDist = currentDist;
-    }
+    // Choose the branch to proceed
+    kDTreeNode *closerSubtree = (target[axis] < node->data[axis]) ? node->left : node->right;
+    kDTreeNode *fartherSubtree = (target[axis] < node->data[axis]) ? node->right : node->left;
 
-    int dim = depth % k;
+    // Recursively search the closer subtree
+    nearestNeighbourHelper(closerSubtree, target, best);
 
-    if (target[dim] < current->data[dim])
+    // If the current node is closer than the stored nearest neighbor, update the nearest neighbor
+    if (best == nullptr || distance(node->data, target) < distance(best->data, target))
+        best = node;
+
+    // Check if need to search the other subtree
+    if (abs(target[axis] - node->data[axis]) < distance(target, best->data))
     {
-        nearestNeighbourHelper(target, current->left, best, bestDist, depth + 1, k);
-        if (current->right != nullptr && minDistToPlane(target, current) <= bestDist)
-        {
-            nearestNeighbourHelper(target, current->right, best, bestDist, depth + 1, k);
-        }
-    }
-    else
-    {
-        nearestNeighbourHelper(target, current->right, best, bestDist, depth + 1, k);
-        if (current->left != nullptr && minDistToPlane(target, current) <= bestDist)
-        {
-            nearestNeighbourHelper(target, current->left, best, bestDist, depth + 1, k);
-        }
+        nearestNeighbourHelper(fartherSubtree, target, best);
     }
 }
+
 void kDTree::nearestNeighbour(const vector<int> &target, kDTreeNode *&best)
 {
-    double bestDist = 1e18;
-    nearestNeighbourHelper(target, root, best, bestDist, 0, k);
+    nearestNeighbourHelper(root, target, best);
 }
 
 //
