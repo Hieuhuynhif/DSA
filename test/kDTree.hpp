@@ -74,8 +74,7 @@ public:
     void fit(Dataset &X_train, Dataset &y_train);
     Dataset predict(Dataset &X_test);
     double score(const Dataset &y_test, const Dataset &y_pred);
-
-    //* test case thôi
+    
     void print_Y(const Dataset &y)
     {
         OUTPUT << y.columnName[0] << ": ";
